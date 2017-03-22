@@ -1,6 +1,6 @@
 {
     "name": "node-ecs",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Entity-Component-System for Node.js",
     "keywords": [
         "component",
@@ -22,6 +22,10 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/blinkdog/node-ecs.git"
+    },
+    "dependencies": {
+        "underscore": "1.8.3",
+        "uuid": "3.0.1"
     },
     "devDependencies": {
         "coffee-script": "1.12.4",
