@@ -1,0 +1,32 @@
+{
+    "name": "node-ecs",
+    "version": "0.0.1",
+    "description": "Entity-Component-System for Node.js",
+    "keywords": [
+        "component",
+        "ecs",
+        "entity",
+        "system"
+    ],
+    "homepage": "https://github.com/blinkdog/node-ecs",
+    "bugs": "https://github.com/blinkdog/node-ecs/issues",
+    "license": "AGPL-3.0",
+    "author": "Patrick Meade <veloxi@ticon.net>",
+    "files": [
+        "LICENSE",
+        "README.md",
+        "lib",
+        "package.json"
+    ],
+    "main": "index",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/blinkdog/node-ecs.git"
+    },
+    "devDependencies": {
+        "coffee-script": "1.12.4",
+        "istanbul": "0.4.5",
+        "mocha": "3.2.0",
+        "should": "11.2.1"
+    }
+}
