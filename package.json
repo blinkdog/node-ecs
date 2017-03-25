@@ -1,11 +1,14 @@
 {
     "name": "node-ecs",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Entity-Component-System for Node.js",
     "keywords": [
+        "architecture",
         "component",
         "ecs",
         "entity",
+        "game",
+        "pattern",
         "system"
     ],
     "homepage": "https://github.com/blinkdog/node-ecs",
@@ -15,6 +18,7 @@
     "files": [
         "LICENSE",
         "README.md",
+        "index.js",
         "lib",
         "package.json"
     ],

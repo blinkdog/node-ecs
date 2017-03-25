@@ -18,7 +18,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Security
 - to invite users to upgrade in case of vulnerabilities.
 
-## [0.0.3] - 2017-02-14
+## [0.0.4] - 2017-03-25
+### Added
+- index.js to allow Node.js to require() the module
+
+## [0.0.3] - 2017-03-25
 ### Added
 - CHANGELOG.md to record changes to the library
 - README.md contains full documentation, including API
@@ -31,14 +35,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - hello and helloTest; they aren't needed in the library
 
-## [0.0.2] - 2017-02-11
+## [0.0.2] - 2017-03-22
 ### Added
 - Basic Entity-Component-System implementation
 
-## 0.0.1 - 2017-02-11
+## 0.0.1 - 2017-03-22
 ### Added
 - Initial project structure
 
-[Unreleased]: https://github.com/blinkdog/node-ecs/compare/v0.0.3...HEAD
+[Unreleased]: https://github.com/blinkdog/node-ecs/compare/v0.0.4...HEAD
+[0.0.4]: https://github.com/blinkdog/node-ecs/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/blinkdog/node-ecs/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/blinkdog/node-ecs/compare/v0.0.1...v0.0.2
