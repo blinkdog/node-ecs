@@ -15,14 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
+_ = require "underscore"
 should = require "should"
 
 mut = require "../lib/ecs"
 
-describe "ecs", ->
-  it "should obey the laws of logic", ->
-    true.should.equal true
-
+describe "node-ecs", ->
   it "should export a class World", ->
     mut.should.have.property "World"
     mut.World.should.be.a.Function()
@@ -33,29 +31,51 @@ describe "ecs", ->
     beforeEach ->
       world = new mut.World()
 
-    it "should emit when an entity is created", (done) ->
-      world.on "entity-created", (e) ->
-        return done() if e?
-        done new Error "e == null"
+    it "should be able to create a world", ->
+      world.should.be.ok()
+      world.should.have.properties [
+        "addComponent"
+        "createEntity"
+        "find"
+        "findAll"
+        "remove"
+        "removeComponent"
+        "removeEntity"
+        "size"
+      ]
+
+    it "should be able to report the number of entities", ->
+      world.size().should.equal 0
+
+    it "should be able to create an entity", ->
+      entity = world.createEntity()
+      entity.should.be.ok()
+      entity.should.have.property "uuid"
+      world.size().should.equal 1
+
+    it "should be able to create an entity with a specific id", ->
+      entity = world.createEntity "330f6aa3-fbf3-48f0-b00f-3cafaedc353f"
+      entity.should.be.ok()
+      entity.should.have.property "uuid"
+      entity.uuid.should.equal "330f6aa3-fbf3-48f0-b00f-3cafaedc353f"
+      world.size().should.equal 1
+
+    it "should be able to remove an entity", ->
+      entity = world.createEntity()
+      entity.should.be.ok()
+      entity.should.have.property "uuid"
+      world.size().should.equal 1
+      world.removeEntity entity
+      world.size().should.equal 0
+
+    it "should be able to create multiple entities", ->
       world.size().should.equal 0
       world.createEntity()
-      world.size().should.equal 1
+      world.createEntity()
+      world.createEntity()
+      world.size().should.equal 3
 
-    it "should emit when an entity is removed", (done) ->
-      world.on "entity-removed", (e) ->
-        return done() if e?
-        done new Error "e == null"
-      world.size().should.equal 0
-      x = world.createEntity()
-      world.size().should.equal 1
-      world.removeEntity x
-      world.size().should.equal 0
-
-    it "should emit when removing all entities", (done) ->
-      count = 0
-      world.on "entity-removed", (e) ->
-        count++
-        done() if count is 4
+    it "should be able to remove all entities", ->
       world.size().should.equal 0
       world.createEntity()
       world.createEntity()
@@ -63,395 +83,188 @@ describe "ecs", ->
       world.size().should.equal 3
       world.remove()
       world.size().should.equal 0
-      world.createEntity()
-      world.size().should.equal 1
-      world.remove()
 
-    it "should create entities with custom ID values", ->
-      x = world.createEntity "266921d3-5466-4d67-aa14-a5bfdc5515f3"
-      x.should.have.property "uuid"
-      x.uuid.should.equal "266921d3-5466-4d67-aa14-a5bfdc5515f3"
-
-    it "should emit when a component is added", (done) ->
-      count = 0
-      world.on "component-added", (component, entity) ->
-        count++
-        done() if count is 3
+    it "should be able to remove specific entities", ->
       world.size().should.equal 0
-      entity = world.createEntity()
-      world.addComponent entity, "name",
-        name: "Bob"
-      world.addComponent entity, "position",
-        x: 5
-        y: 10
-      world.addComponent entity, "notes"
-      world.size().should.equal 1
+      e1 = world.createEntity()
+      e2 = world.createEntity()
+      e3 = world.createEntity()
+      e4 = world.createEntity()
+      e5 = world.createEntity()
+      world.size().should.equal 5
+      world.removeEntity e2
+      world.removeEntity e4
+      world.size().should.equal 3
 
-    it "should emit when a component is removed", (done) ->
-      world.on "component-removed", (component, entity) ->
-        done() if entity?
+    it "should be able to find all entities", ->
       world.size().should.equal 0
-      entity = world.createEntity()
-      world.addComponent entity, "name",
-        name: "Bob"
-      world.addComponent entity, "position",
-        x: 5
-        y: 10
-      world.addComponent entity, "notes"
-      world.size().should.equal 1
-      world.removeComponent entity, "notes"
+      e1 = world.createEntity()
+      e2 = world.createEntity()
+      e3 = world.createEntity()
+      e4 = world.createEntity()
+      e5 = world.createEntity()
+      world.size().should.equal 5
+      world.removeEntity e2
+      world.removeEntity e4
+      world.size().should.equal 3
+      es = world.findAll()
+      es.length.should.equal 3
+      es[0].should.equal e1
+      es[1].should.equal e5
+      es[2].should.equal e3
 
-    it "should be able to find entities by components", ->
-      world.size().should.equal 0
-
+    it "should add a component to an entity", ->
       player = world.createEntity()
+      world.size().should.equal 1
       world.addComponent player, "name",
-        name: "Bob"
-      world.addComponent player, "position",
-        x: 255
-        y: 174
-      world.addComponent player, "velocity",
-        x: 0
-        y: -1
-      world.addComponent player, "health",
-        hp: 22
-      world.addComponent player, "armor",
-        ac: 15
-        dr: 2
+        first: "Fred"
+        last: "Bloggs"
+      player.should.have.property "name"
+      player.name.should.eql
+        first: "Fred"
+        last: "Bloggs"
 
-      arrow = world.createEntity()
-      world.addComponent arrow, "position",
-        x: 200
-        y: 173
-      world.addComponent arrow, "velocity",
-        x: 55
-        y: 0
-      world.addComponent arrow, "damage",
-        hp: 5
-
-      powerup = world.createEntity()
-      world.addComponent powerup, "name",
-        name: "Health Potion"
-      world.addComponent powerup, "position",
-        x: 123
-        y: 73
-      world.addComponent powerup, "damage",
-        hp: -20
-
-      world.size().should.equal 3
-
-      movers = world.find ["position", "velocity"]
-      movers.length.should.equal 2
-      movers[0].should.equal player
-      movers[1].should.equal arrow
-
-      movers2 = world.find ["velocity", "position"]
-      movers2.length.should.equal 2
-      movers2[0].should.equal player
-      movers2[1].should.equal arrow
-
-      named = world.find "name"
-      named.length.should.equal 2
-      named[0].should.equal player
-      named[1].should.equal powerup
-
-      damagePlace = world.find ["position", "damage"]
-      damagePlace.length.should.equal 2
-      damagePlace[0].should.equal arrow
-      damagePlace[1].should.equal powerup
-
-    it "should find entities after component mutation", ->
-      world.size().should.equal 0
-
+    it "should add empty data if no component is provided", ->
       player = world.createEntity()
+      world.size().should.equal 1
+      world.addComponent player, "name"
+      player.should.have.property "name"
+      player.name.should.eql {}
+
+    it "should be able to find entities by component", ->
+      player = world.createEntity()
+      world.size().should.equal 1
       world.addComponent player, "name",
-        name: "Bob"
-      world.addComponent player, "position",
-        x: 255
-        y: 174
-      world.addComponent player, "velocity",
-        x: 0
-        y: -1
-      world.addComponent player, "health",
-        hp: 22
-      world.addComponent player, "armor",
-        ac: 15
-        dr: 2
+        first: "Fred"
+        last: "Bloggs"
+      players = world.find "name"
+      players.length.should.equal 1
+      players[0].name.should.eql
+        first: "Fred"
+        last: "Bloggs"
 
-      arrow = world.createEntity()
-      world.addComponent arrow, "position",
-        x: 200
-        y: 173
-      world.addComponent arrow, "velocity",
-        x: 55
-        y: 0
-      world.addComponent arrow, "damage",
-        hp: 5
-
-      powerup = world.createEntity()
-      world.addComponent powerup, "name",
-        name: "Health Potion"
-      world.addComponent powerup, "position",
-        x: 123
-        y: 73
-      world.addComponent powerup, "damage",
-        hp: -20
-
-      world.size().should.equal 3
-
-      healthMods = world.find "damage"
-      healthMods.length.should.equal 2
-      healthMods[0].should.equal arrow
-      healthMods[1].should.equal powerup
-
-      armored = world.find "armor"
-      armored.length.should.equal 1
-      armored[0].should.equal player
-
-      world.removeComponent player, "armor"
-
-      world.size().should.equal 3
-
-      armored = world.find "armor"
-      armored.length.should.equal 0
-
-      world.addComponent player, "armor",
-        ac: 25
-        dr: 5
-
-      armored = world.find "armor"
-      armored.length.should.equal 1
-      armored[0].should.equal player
-
-      movers = world.find ["position", "velocity"]
-      movers.length.should.equal 2
-      movers[0].should.equal player
-      movers[1].should.equal arrow
-
-      world.removeComponent player, "armor"
-
-      armored = world.find "armor"
-      armored.length.should.equal 0
-
-      movers = world.find ["position", "velocity"]
-      movers.length.should.equal 2
-      movers[0].should.equal player
-      movers[1].should.equal arrow
-
-      world.addComponent player, "armor",
-        ac: 35
-        dr: 10
-
-      armored = world.find "armor"
-      armored.length.should.equal 1
-      armored[0].should.equal player
-
-      movers = world.find ["position", "velocity"]
-      movers.length.should.equal 2
-      movers[0].should.equal player
-      movers[1].should.equal arrow
-
-      world.removeComponent player, "velocity"
-
-      armored = world.find "armor"
-      armored.length.should.equal 1
-      armored[0].should.equal player
-
-      movers = world.find ["position", "velocity"]
-      movers.length.should.equal 1
-      movers[0].should.equal arrow
-
-      world.addComponent player, "velocity",
-        x: 0
-        y: 1
-
-      armored = world.find "armor"
-      armored.length.should.equal 1
-      armored[0].should.equal player
-
-      movers = world.find ["position", "velocity"]
-      movers.length.should.equal 2
-      movers[0].should.equal arrow
-      movers[1].should.equal player
-
+    it "should be able to find entities by multiple components", ->
+      electron = world.createEntity()
+      world.addComponent electron, "velocity", {dx:-10, dy:20}
+      dog = world.createEntity()
+      world.addComponent dog, "position", {x:25, y:25}
+      world.addComponent dog, "velocity", {dx:5, dy:0}
       flag = world.createEntity()
-      world.size().should.equal 4
-
-      world.addComponent flag, "position",
-        x: 25
-        y: 25
-
-      movers = world.find ["position", "velocity"]
-      movers.length.should.equal 2
-      movers[0].should.equal arrow
-      movers[1].should.equal player
-
-    it "should not find entities after entity removal", ->
-      world.size().should.equal 0
-
-      player = world.createEntity()
-      world.addComponent player, "name",
-        name: "Bob"
-      world.addComponent player, "position",
-        x: 255
-        y: 174
-      world.addComponent player, "velocity",
-        x: 0
-        y: -1
-      world.addComponent player, "health",
-        hp: 22
-      world.addComponent player, "armor",
-        ac: 15
-        dr: 2
-
-      arrow = world.createEntity()
-      world.addComponent arrow, "position",
-        x: 200
-        y: 173
-      world.addComponent arrow, "velocity",
-        x: 55
-        y: 0
-      world.addComponent arrow, "damage",
-        hp: 5
-
-      powerup = world.createEntity()
-      world.addComponent powerup, "name",
-        name: "Health Potion"
-      world.addComponent powerup, "position",
-        x: 123
-        y: 73
-      world.addComponent powerup, "damage",
-        hp: -20
-
-      world.size().should.equal 3
-
-      healthMods = world.find "damage"
-      healthMods.length.should.equal 2
-      healthMods[0].should.equal arrow
-      healthMods[1].should.equal powerup
-
-      movers = world.find ["position", "velocity"]
-      movers.length.should.equal 2
-      movers[0].should.equal player
-      movers[1].should.equal arrow
-
-      world.removeEntity arrow
-
+      world.addComponent flag, "position", {x:25, y:25}
+      moving = world.find "velocity"
+      moving.length.should.equal 2
+      located = world.find "position"
+      located.length.should.equal 2
       movers = world.find ["position", "velocity"]
       movers.length.should.equal 1
-      movers[0].should.equal player
 
-      world.removeEntity arrow
+    it "should not create unnecessary indexes", ->
+      electron = world.createEntity()
+      world.addComponent electron, "velocity", {dx:-10, dy:20}
+      dog = world.createEntity()
+      world.addComponent dog, "position", {x:25, y:25}
+      world.addComponent dog, "velocity", {dx:5, dy:0}
+      flag = world.createEntity()
+      world.addComponent flag, "position", {x:25, y:25}
+      _.size(world.indexes).should.equal 0
+      movers = world.find ["position", "velocity"]
+      _.size(world.indexes).should.equal 1
+      movers2 = world.find ["velocity", "position"]
+      _.size(world.indexes).should.equal 1
+      movers.should.eql movers2
 
-    it "should find all entities", ->
-      world.size().should.equal 0
+    it "should not index removed entities", ->
+      electron = world.createEntity()
+      world.addComponent electron, "velocity", {dx:-10, dy:20}
+      dog = world.createEntity()
+      world.addComponent dog, "position", {x:25, y:25}
+      world.addComponent dog, "velocity", {dx:5, dy:0}
+      flag = world.createEntity()
+      world.addComponent flag, "position", {x:25, y:25}
+      located = world.find "position"
+      located.length.should.equal 2
+      world.removeEntity dog
+      located = world.find "position"
+      located.length.should.equal 1
 
-      player = world.createEntity()
-      world.addComponent player, "name",
-        name: "Bob"
-      world.addComponent player, "position",
-        x: 255
-        y: 174
-      world.addComponent player, "velocity",
-        x: 0
-        y: -1
-      world.addComponent player, "health",
-        hp: 22
-      world.addComponent player, "armor",
-        ac: 15
-        dr: 2
+    it "should not affect indexes not containing removed entities", ->
+      electron = world.createEntity()
+      world.addComponent electron, "velocity", {dx:-10, dy:20}
+      dog = world.createEntity()
+      world.addComponent dog, "position", {x:25, y:25}
+      world.addComponent dog, "velocity", {dx:5, dy:0}
+      flag = world.createEntity()
+      world.addComponent flag, "position", {x:25, y:25}
+      speedy = world.find "velocity"
+      speedy.length.should.equal 2
+      located = world.find "position"
+      located.length.should.equal 2
+      speedy.length.should.equal 2
+      world.removeEntity flag
+      located = world.find "position"
+      located.length.should.equal 1
+      speedy.length.should.equal 2
 
-      arrow = world.createEntity()
-      world.addComponent arrow, "position",
-        x: 200
-        y: 173
-      world.addComponent arrow, "velocity",
-        x: 55
-        y: 0
-      world.addComponent arrow, "damage",
-        hp: 5
+    it "should not affect indexes not indexing added components", ->
+      electron = world.createEntity()
+      world.addComponent electron, "velocity", {dx:-10, dy:20}
+      dog = world.createEntity()
+      world.addComponent dog, "position", {x:25, y:25}
+      world.addComponent dog, "velocity", {dx:5, dy:0}
+      flag = world.createEntity()
+      world.addComponent flag, "position", {x:25, y:25}
+      speedy = world.find "velocity"
+      speedy.length.should.equal 2
+      typed = world.find "nationality"
+      typed.length.should.equal 0
+      world.addComponent flag, "nationality", {nation:"United States"}
+      typed = world.find "nationality"
+      typed.length.should.equal 1
+      speedy = world.find "velocity"
+      speedy.length.should.equal 2
 
-      powerup = world.createEntity()
-      world.addComponent powerup, "name",
-        name: "Health Potion"
-      world.addComponent powerup, "position",
-        x: 123
-        y: 73
-      world.addComponent powerup, "damage",
-        hp: -20
+    it "should not index until all components are present", ->
+      person = world.createEntity()
+      world.size().should.equal 1
+      xmen = world.find ["mutant", "name", "team"]
+      xmen.length.should.equal 0
+      world.addComponent person, "name",
+        name: "Logan"
+        codename: "Wolverine"
+      xmen = world.find ["mutant", "name", "team"]
+      xmen.length.should.equal 0
+      world.addComponent person, "mutant",
+        mutant: true
+      xmen = world.find ["mutant", "name", "team"]
+      xmen.length.should.equal 0
+      world.addComponent person, "team",
+        team: "X-Men"
+      xmen = world.find ["mutant", "name", "team"]
+      xmen.length.should.equal 1
+      xmen[0].should.equal person
 
-      world.size().should.equal 3
-
-      everything = world.findAll()
-      everything.length.should.equal 3
-      everything[0].should.equal player
-      everything[1].should.equal arrow
-      everything[2].should.equal powerup
-
-      world.removeEntity player
-
-      everything = world.findAll()
-      everything.length.should.equal 2
-      everything[0].should.equal powerup
-      everything[1].should.equal arrow
-
-    it "should remove entities sequentially", ->
-      world.size().should.equal 0
-
-      player = world.createEntity()
-      world.addComponent player, "name",
-        name: "Bob"
-      world.addComponent player, "position",
-        x: 255
-        y: 174
-      world.addComponent player, "velocity",
-        x: 0
-        y: -1
-      world.addComponent player, "health",
-        hp: 22
-      world.addComponent player, "armor",
-        ac: 15
-        dr: 2
-
-      arrow = world.createEntity()
-      world.addComponent arrow, "position",
-        x: 200
-        y: 173
-      world.addComponent arrow, "velocity",
-        x: 55
-        y: 0
-      world.addComponent arrow, "damage",
-        hp: 5
-
-      powerup = world.createEntity()
-      world.addComponent powerup, "name",
-        name: "Health Potion"
-      world.addComponent powerup, "position",
-        x: 123
-        y: 73
-      world.addComponent powerup, "damage",
-        hp: -20
-
-      world.size().should.equal 3
-
-      everything = world.findAll()
-      everything.length.should.equal 3
-      everything[0].should.equal player
-      everything[1].should.equal arrow
-      everything[2].should.equal powerup
-
-      world.removeEntity player
-
-      everything = world.findAll()
-      everything.length.should.equal 2
-      everything[0].should.equal powerup
-      everything[1].should.equal arrow
-
-      world.removeEntity powerup
-
-      everything = world.findAll()
-      everything.length.should.equal 1
-      everything[0].should.equal arrow
+    it "should de-index if a component is removed", ->
+      person = world.createEntity()
+      world.size().should.equal 1
+      xmen = world.find ["mutant", "name", "team"]
+      xmen.length.should.equal 0
+      world.addComponent person, "name",
+        name: "Logan"
+        codename: "Wolverine"
+      xmen = world.find ["mutant", "name", "team"]
+      xmen.length.should.equal 0
+      world.addComponent person, "mutant",
+        mutant: true
+      xmen = world.find ["mutant", "name", "team"]
+      xmen.length.should.equal 0
+      world.addComponent person, "team",
+        team: "X-Men"
+      xmen = world.find ["mutant", "name", "team"]
+      xmen.length.should.equal 1
+      xmen[0].should.equal person
+      world.removeComponent person, "team"
+      xmen = world.find ["mutant", "name", "team"]
+      xmen.length.should.equal 0
 
 #----------------------------------------------------------------------
 # end of ecsTest.coffee

@@ -28,12 +28,14 @@ class Index
     world.on "component-added", @updateComponentAdded
     world.on "component-removed", @updateComponentRemoved
     world.on "entity-removed", @updateEntityRemoved
-    # check each entity that already exists
-    for entity in world.entities
+    # if this is the master index, stop here
+    return if not world.index?
+    # otherwise check each entity that already exists
+    for entity in world.index.entities
       # if the entity has everything we require
       checkMe = _.intersection @concerns, _.keys(entity)
       if checkMe.length is @concerns.length
-        # add it to our index
+        # add it to this index
         @uuidIndexMap[entity.uuid] = @entities.length
         @entities.push entity
 
@@ -49,7 +51,7 @@ class Index
     @entities.pop()
     delete @uuidIndexMap[entity.uuid]
 
-  updateComponentAdded: (component, entity) =>
+  updateComponentAdded: (entity, component) =>
     # if we've already got it, we're done
     return if @uuidIndexMap[entity.uuid]?
     # if we don't care about that component, we're done
@@ -61,12 +63,12 @@ class Index
     @uuidIndexMap[entity.uuid] = @entities.length
     @entities.push entity
 
-  updateComponentRemoved: (component, entity) =>
+  updateComponentRemoved: (entity, component) =>
     # if don't have it, we're done
     return if not @uuidIndexMap[entity.uuid]?
     # if we don't care about that component, we're done
     return if not (component in @concerns)
-    # by definition, we have it and we care about that component
+    # we have it and we care about the removed component
     index = @uuidIndexMap[entity.uuid]
     lastIndex = @entities.length-1
     lastEntity = @entities[lastIndex]
@@ -77,9 +79,8 @@ class Index
 
 class exports.World extends EventEmitter
   constructor: ->
-    @entities = []
+    @index = new Index ["uuid"], this
     @indexes = {}
-    @uuidIndexMap = {}
 
   addComponent: (entity, component, data) ->
     if data?
@@ -87,17 +88,15 @@ class exports.World extends EventEmitter
     else
       cleanData = {}
     entity[component] = cleanData
-    @emit "component-added", component, entity
+    @emit "component-added", entity, component
     return entity
 
   createEntity: (id) ->
     id ?= uuid()
     entity =
       uuid: id
-    @uuidIndexMap[id] = @entities.length
-    @entities.push entity
     @emit "entity-created", entity
-    @emit "component-added", "uuid", entity
+    @emit "component-added", entity, "uuid"
     return entity
 
   find: (components) ->
@@ -110,30 +109,25 @@ class exports.World extends EventEmitter
     return @indexes[indexName].entities
 
   findAll: ->
-    return @entities
+    return @index.entities
 
   remove: ->
-    while @entities.length > 0
-      @removeEntity _.last @entities
+    while @index.entities.length > 0
+      @removeEntity _.last @index.entities
     return this
 
   removeComponent: (entity, component) ->
+    @emit "component-removed", entity, component
     delete entity[component]
-    @emit "component-removed", component, entity
+    return entity
 
-  removeEntity: (e) ->
-    @emit "entity-removed", e
-    index = @uuidIndexMap[e.uuid]
-    lastIndex = @entities.length-1
-    lastEntity = @entities[lastIndex]
-    @entities[index] = lastEntity
-    @uuidIndexMap[lastEntity.uuid] = index
-    @entities.pop()
-    delete @uuidIndexMap[e.uuid]
+  removeEntity: (entity) ->
+    @emit "entity-removed", entity
+    @removeComponent entity, "uuid"
     return this
 
   size: ->
-    return @entities.length
+    return @index.entities.length
 
 #----------------------------------------------------------------------
 # end of ecs.coffee
