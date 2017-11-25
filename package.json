@@ -1,6 +1,6 @@
 {
-    "name": "node-ecs",
-    "version": "0.0.4",
+    "name": "index-ecs",
+    "version": "1.0.0",
     "description": "Entity-Component-System for Node.js",
     "keywords": [
         "architecture",
@@ -8,6 +8,7 @@
         "ecs",
         "entity",
         "game",
+        "index",
         "pattern",
         "system"
     ],
@@ -16,11 +17,12 @@
     "license": "AGPL-3.0",
     "author": "Patrick Meade <veloxi@ticon.net>",
     "files": [
-        "LICENSE",
-        "README.md",
+        "CHANGELOG.md",
         "index.js",
         "lib",
-        "package.json"
+        "LICENSE",
+        "package.json",
+        "README.md"
     ],
     "main": "index",
     "repository": {
@@ -29,12 +31,12 @@
     },
     "dependencies": {
         "underscore": "1.8.3",
-        "uuid": "3.0.1"
+        "uuid": "3.1.0"
     },
     "devDependencies": {
-        "coffee-script": "1.12.4",
+        "coffeescript": "2.0.2",
         "istanbul": "0.4.5",
-        "mocha": "3.2.0",
-        "should": "11.2.1"
+        "mocha": "4.0.1",
+        "should": "13.1.3"
     }
 }

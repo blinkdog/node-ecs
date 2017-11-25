@@ -158,6 +158,44 @@ describe "node-ecs", ->
       movers = world.find ["position", "velocity"]
       movers.length.should.equal 1
 
+    it "should be able to find entities by id", ->
+      player = world.createEntity()
+      player.uuid.should.be.a.String()
+      {uuid} = player
+      world.size().should.equal 1
+      world.addComponent player, "name",
+        first: "Fred"
+        last: "Bloggs"
+      players = world.find "name"
+      players.length.should.equal 1
+      players[0].name.should.eql
+        first: "Fred"
+        last: "Bloggs"
+      myPlayer = world.findById uuid
+      myPlayer.should.be.an.Object()
+      myPlayer.name.should.eql
+        first: "Fred"
+        last: "Bloggs"
+      myPlayer.uuid.should.equal uuid
+      myPlayer.should.equal players[0]
+      myPlayer.should.equal player
+
+    it "should not return entities by id that don't exist", ->
+      player = world.createEntity()
+      player.uuid.should.be.a.String()
+      {uuid} = player
+      world.size().should.equal 1
+      world.addComponent player, "name",
+        first: "Fred"
+        last: "Bloggs"
+      players = world.find "name"
+      players.length.should.equal 1
+      players[0].name.should.eql
+        first: "Fred"
+        last: "Bloggs"
+      myPlayer = world.findById "47d11ff8-b121-494f-9a5a-9a261ec3f243"
+      should(myPlayer).equal undefined
+
     it "should not create unnecessary indexes", ->
       electron = world.createEntity()
       world.addComponent electron, "velocity", {dx:-10, dy:20}

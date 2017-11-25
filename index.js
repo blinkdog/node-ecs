@@ -1,1 +1,1 @@
-module.exports.World = require('./lib/ecs').World;
+module.exports = require('./lib/ecs');

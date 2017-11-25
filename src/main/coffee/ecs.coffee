@@ -79,14 +79,12 @@ class Index
 
 class exports.World extends EventEmitter
   constructor: ->
+    super()
     @index = new Index ["uuid"], this
     @indexes = {}
 
   addComponent: (entity, component, data) ->
-    if data?
-      cleanData = JSON.parse JSON.stringify data
-    else
-      cleanData = {}
+    cleanData = data || {}
     entity[component] = cleanData
     @emit "component-added", entity, component
     return entity
@@ -110,6 +108,9 @@ class exports.World extends EventEmitter
 
   findAll: ->
     return @index.entities
+
+  findById: (id) ->
+    return @index.entities[@index.uuidIndexMap[id]]
 
   remove: ->
     while @index.entities.length > 0

@@ -18,6 +18,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Security
 - to invite users to upgrade in case of vulnerabilities.
 
+## [1.0.0] - 2017-11-25
+### Added
+- findById method finds an entity by UUID
+- Call to super in World constructor
+
+### Changed
+- Allow data to be directly assigned to components
+- index.js to import ecs module, not just World
+- Name of package from node-ecs to index-ecs for npm publication
+- .gitignore to GitHub supplied version for Node
+
+### Fixed
+- Dependencies in package.json; updated to CoffeeScript 2
+
 ## [0.0.4] - 2017-03-25
 ### Added
 - index.js to allow Node.js to require() the module
@@ -43,7 +57,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial project structure
 
-[Unreleased]: https://github.com/blinkdog/node-ecs/compare/v0.0.4...HEAD
+[Unreleased]: https://github.com/blinkdog/node-ecs/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/blinkdog/node-ecs/compare/v0.0.4...v1.0.0
 [0.0.4]: https://github.com/blinkdog/node-ecs/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/blinkdog/node-ecs/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/blinkdog/node-ecs/compare/v0.0.1...v0.0.2

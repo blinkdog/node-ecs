@@ -1,4 +1,4 @@
-# node-ecs
+# index-ecs
 Entity-Component-System for Node.js
 
 ## Motivation
@@ -15,13 +15,7 @@ they grew. Moreover, game designers often needed code changes in
 order to modify the game content.
 
 The ECS pattern emphasizes separation of concerns by organizing things
-into three areas:
-
-* `Entity` - An identified collection of Components; typically any
-object in a game. These could be a wall, a rock, a tree, a power-up,
-the player, the enemies, the weather, etc. Entities contain no code,
-they have some ID value, and reference a collection of Components.
-All of the entities that exist are said to live in a World.
+into three distinct areas:
 
 * `Component` - A set of data that defines an aspect / attribute / facet
 of existence. Things that exist somewhere might have a "position" component
@@ -30,21 +24,27 @@ be damaged and/or killed might have a "health" component with a data element
 "hit-points". Components do not contain code, they are simply a type-named
 collection of related data.
 
-* `System` - Code that operates on Component(s). All of the code lives here,
-and uses the existence of components to decide which entities to operate
-upon. For example, a Mover system might look for all entities with "position"
-and "velocity" components and then update the positions according to the
-velocities. A System operates only on the entities that contain relevant
-Components, and ignores the others.
+* `Entity` - An identified collection of Components; typically any
+object in a game. These could be a wall, a rock, a tree, a power-up,
+the player, the enemies, the weather, etc. Entities contain no code,
+they have some ID value, and reference a collection of Components.
+All of the entities that exist are said to live in a World.
+
+* `System` - Code that operates on Entities and Components. All of the
+application code lives here, and uses the existence of components to decide
+which entities to operate upon. For example, a Mover system might look for
+all entities with "position" and "velocity" components and then update the
+positions according to the velocities. A System operates only on the entities
+that contain relevant Components, and ignores the others.
 
 ## Usage
 This library provides support for the `Entity` and `Component` aspects
 of an ECS implementation. A `System` is simply code, and it is assumed
 that developers know how to write and organize functions for themselves.
 
-node-ecs provides one component: `World`
+index-ecs provides one class: `World`
 
-    var World = require('node-ecs').World;
+    var World = require('index-ecs').World;
 
 This component `World` provides several methods. The purpose of these
 methods are summarized below. API details along with examples are
@@ -54,6 +54,7 @@ covered in the section to follow.
 * `createEntity` - Create a new Entity and add it to the World
 * `find` - Find Entities by the Component(s) they contain
 * `findAll` - Find ALL Entities contained in the World
+* `findById` - Find a specific Entity by its UUID
 * `remove` - Remove ALL Entities from the World
 * `removeComponent` - Remove a Component from an Entity
 * `removeEntity` - Remove an Entity from the World
@@ -75,29 +76,29 @@ Example:
 
     var world = new World();
     var dog = world.createEntity();
-    // nobody has named this poor doggie yet
-    world.addComponent(dog, "name");
-    // dog.name = {}
+    // this poor doggie is lost
+    world.addComponent(dog, "position");
+    // dog.position = {}
 
 Example 2:
 
     var world = new World();
     var dog = world.createEntity();
-    world.addComponent(dog, "breed", {
-      type: "Labrador",
-      color: "Black"
+    world.addComponent(dog, "position", {
+      x: -120,
+      y: 50,
+      z: 2
     });
-    // dog.breed = { type: "Labrador", color: "Black" }
+    // dog.position = { x:-120, y:50, z:2 }
 
 ### createEntity(id) -> entity
 Create a new entity, and add that entity to the world.
 
 * `id` String (UUID v4) [Optional]: The ID to be used by the Entity.
 
-The `id` value is optional, and intended only for very advanced use-cases.
-It is recommended that you allow the `World` to generate an ID for the
-entity. Systems concern themselves with components, so access to an
-entity by a known ID is something of an anti-pattern in ECS architecture.
+The `id` value is optional, and supplying it is intended only for very
+advanced use-cases. It is recommended that you allow the `World` to
+generate an ID for the entity.
 
 The created `entity` is returned by the call.
 
@@ -164,6 +165,24 @@ This method is intended for advanced use-cases only; perhaps debugging,
 logging, metrics, monitoring, serialization, etc. Note that it is an
 anti-pattern to obtain all of the entities and iterate over each one
 looking for specific components. Use the `find()` method instead.
+
+### findById(id) -> entity
+Find the identified entity.
+
+* `id` UUID v4: The UUID that identifies the entity
+
+An Entity or undefined is returned by the call. If an entity with the
+provided UUID is found, it will be returned. Otherwise the call will
+return undefined to indicate that the entity does not exist.
+
+Example:
+
+    var world = new World();
+    var dog = world.createEntity();
+    var dogTag = dog.uuid;
+    // ... in some other part of the code
+    var myDog = world.findById(dogTag);
+    // myDog === dog
 
 ### remove() -> World
 Remove all entities from the World.
@@ -306,16 +325,16 @@ Example:
     // Goodbye ID <some generated UUID v4 value>
 
 ## Development
-In order to make modifications to node-ecs, you'll need to establish a
+In order to make modifications to index-ecs, you'll need to establish a
 development environment:
 
     git clone https://github.com/blinkdog/node-ecs.git
     cd node-ecs
     npm install
-    cake rebuild
+    node_modules/.bin/cake rebuild
 
 ### Code Coverage
-You can see the [istanbul] coverage report for node-ecs with a task
+You can see the [istanbul] coverage report for index-ecs with a task
 in the cake file:
 
     cake coverage
@@ -331,7 +350,7 @@ The source files are located in `src/main/coffee`.
 The test source files are located in `src/test/coffee`.
 
 ## License
-node-ecs  
+index-ecs  
 Copyright 2017 Patrick Meade.
 
 This program is free software: you can redistribute it and/or modify
