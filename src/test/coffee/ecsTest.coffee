@@ -304,5 +304,42 @@ describe "node-ecs", ->
       xmen = world.find ["mutant", "name", "team"]
       xmen.length.should.equal 0
 
+    it "should not return an internal index from findAll()", ->
+      thing1 = world.createEntity()
+      world.size().should.equal 1
+      thing2 = world.createEntity()
+      world.size().should.equal 2
+      thing3 = world.createEntity()
+      world.size().should.equal 3
+      allThings = world.findAll()
+      thing4 = world.createEntity()
+      world.size().should.equal 4
+      allThings2 = world.findAll()
+      allThings.length.should.equal 3
+      allThings2.length.should.equal 4
+      allThings.should.not.equal allThings2
+
+    it "should not return an internal index from find()", ->
+      world.size().should.equal 0
+      for i in [1..5]
+        thing = world.createEntity()
+        world.addComponent thing, "monster", { id: i }
+        world.addComponent thing, "health", { hp: 100 }
+      world.size().should.equal 5
+      thing = world.createEntity()
+      world.addComponent thing, "hero", { id: 0 }
+      world.addComponent thing, "health", { hp: 100 }
+      world.size().should.equal 6
+      monsters = world.find "monster"
+      monsters.length.should.equal 5
+      thing = world.createEntity()
+      world.addComponent thing, "monster", { id: i }
+      world.addComponent thing, "health", { hp: 100 }
+      world.size().should.equal 7
+      monsters.length.should.equal 5
+      monsters2 = world.find "monster"
+      monsters2.length.should.equal 6
+      monsters.should.not.equal monsters2
+
 #----------------------------------------------------------------------
 # end of ecsTest.coffee

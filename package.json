@@ -1,6 +1,6 @@
 {
     "name": "index-ecs",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Entity-Component-System for Node.js",
     "keywords": [
         "architecture",
@@ -31,12 +31,12 @@
     },
     "dependencies": {
         "underscore": "1.8.3",
-        "uuid": "3.1.0"
+        "uuid": "3.2.1"
     },
     "devDependencies": {
-        "coffeescript": "2.0.2",
+        "coffeescript": "2.2.3",
         "istanbul": "0.4.5",
-        "mocha": "4.0.1",
-        "should": "13.1.3"
+        "mocha": "5.0.4",
+        "should": "13.2.1"
     }
 }

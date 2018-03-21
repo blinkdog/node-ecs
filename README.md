@@ -277,7 +277,7 @@ Example:
 ### component-removed -> (entity, component)
 Fired when a Component is removed from an Entity.
 
-* `entity` Object: The entity to which a Component was removed
+* `entity` Object: The entity from which a Component was removed
 * `component` String: The name of the Component removed from the Entity
 
 Example:

@@ -104,10 +104,10 @@ class exports.World extends EventEmitter
     indexName = concerns.join ":"
     if not @indexes[indexName]?
       @indexes[indexName] = new Index concerns, this
-    return @indexes[indexName].entities
+    return @indexes[indexName].entities.slice 0
 
   findAll: ->
-    return @index.entities
+    return @index.entities.slice 0
 
   findById: (id) ->
     return @index.entities[@index.uuidIndexMap[id]]

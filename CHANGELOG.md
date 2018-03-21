@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Security
 - to invite users to upgrade in case of vulnerabilities.
 
+## [1.0.1] - 2018-03-21
+### Fixed
+- find() and findAll() no longer return references to internal arrays
+
 ## [1.0.0] - 2017-11-25
 ### Added
 - findById method finds an entity by UUID
@@ -57,7 +61,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial project structure
 
-[Unreleased]: https://github.com/blinkdog/node-ecs/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/blinkdog/node-ecs/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/blinkdog/node-ecs/compare/v0.0.4...v1.0.1
 [1.0.0]: https://github.com/blinkdog/node-ecs/compare/v0.0.4...v1.0.0
 [0.0.4]: https://github.com/blinkdog/node-ecs/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/blinkdog/node-ecs/compare/v0.0.2...v0.0.3
