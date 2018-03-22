@@ -112,6 +112,13 @@ class exports.World extends EventEmitter
   findById: (id) ->
     return @index.entities[@index.uuidIndexMap[id]]
 
+  loadEntity: (entity) ->
+    ent = @createEntity entity.uuid
+    for key of entity
+      if key isnt "uuid"
+        @addComponent ent, key, entity[key]
+    return ent
+
   remove: ->
     while @index.entities.length > 0
       @removeEntity _.last @index.entities

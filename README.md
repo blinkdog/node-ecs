@@ -55,6 +55,7 @@ covered in the section to follow.
 * `find` - Find Entities by the Component(s) they contain
 * `findAll` - Find ALL Entities contained in the World
 * `findById` - Find a specific Entity by its UUID
+* `loadEntity` - Import an existing object as an Entity in the World
 * `remove` - Remove ALL Entities from the World
 * `removeComponent` - Remove a Component from an Entity
 * `removeEntity` - Remove an Entity from the World
@@ -183,6 +184,27 @@ Example:
     // ... in some other part of the code
     var myDog = world.findById(dogTag);
     // myDog === dog
+
+### loadEntity(object) -> entity
+Import an existing object as an Entity in the World.
+
+* `object`: An object to import as an Entity
+
+This method converts an existing object into an Entity in the World.
+The components are a shallow clone (copied references) of the original
+object. Modification of the original object is not recommended after
+calling `loadEntity`.
+
+If the provided object has a `uuid` property, that UUID will be used
+as the identifier of the Entity in the World. If the provided object
+does not contain a `uuid` property, the World will provide one for
+the newly created Entity.
+
+The Entity created by the world to clone the provided object will
+be returned from the call.
+
+This method is intended for use by serialization frameworks rather
+than applications, so no example is provided.
 
 ### remove() -> World
 Remove all entities from the World.

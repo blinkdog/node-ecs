@@ -341,5 +341,40 @@ describe "node-ecs", ->
       monsters2.length.should.equal 6
       monsters.should.not.equal monsters2
 
+    describe "loadEntity", ->
+      it "should be able to load an entity without a uuid", ->
+        entity =
+          position:
+            x: 1
+            y: 2
+            z: 3
+          velocity:
+            dx: -1
+            dy: 0
+            dz: +1
+          name:
+            name: "Fred Bloggs"
+        ent = world.loadEntity entity
+        ent.should.have.properties [ "uuid", "position", "velocity", "name" ]
+        entity.uuid = ent.uuid
+        ent.should.eql entity
+
+      it "should be able to load an entity using a uuid", ->
+        entity =
+          uuid: "7df19fa0-4674-49aa-8c28-765ac034978c"
+          position:
+            x: 1
+            y: 2
+            z: 3
+          velocity:
+            dx: -1
+            dy: 0
+            dz: +1
+          name:
+            name: "Fred Bloggs"
+        ent = world.loadEntity entity
+        ent.should.have.properties [ "uuid", "position", "velocity", "name" ]
+        ent.should.eql entity
+
 #----------------------------------------------------------------------
 # end of ecsTest.coffee
